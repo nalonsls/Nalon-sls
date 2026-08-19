@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nalon.sls — Digital Infrastructure for Creators</title>
+<style>
+  :root{
+    --bg: #0b0b0a;
+    --bg-alt: #141412;
+    --fg: #f2f2ed;
+    --fg-dim: #8c8c86;
+    --line: #2c2c28;
+    --line-soft: #1c1c19;
+  }
+  *{ box-sizing: border-box; margin:0; padding:0; }
+  html{ scroll-behavior: smooth; }
+  body{
+    background: var(--bg);
+    color: var(--fg);
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  .mono{
+    font-family: ui-monospace, 'SF Mono', 'Roboto Mono', Menlo, Consolas, monospace;
+  }
+  ::selection{ background: var(--fg); color: var(--bg); }
+
+  a{ color: inherit; }
+
+  .wrap{
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 0 32px;
+  }
+
+  /* NAV */
+  header{
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: rgba(11,11,10,0.85);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--line-soft);
+  }
+  nav{
+    display:flex;
+    align-items:center;
+    justify-content: space-between;
+    padding: 20px 32px;
+    max-width: 1080px;
+    margin: 0 auto;
+  }
+  .brand{
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    font-size: 15px;
+  }
+  .brand-sub{
+    font-family: ui-monospace, 'SF Mono', monospace;
+    font-size: 10px;
+    color: var(--fg-dim);
+    letter-spacing: 0.12em;
+    margin-left: 10px;
+  }
+  .navlabel{
+    font-family: ui-monospace, 'SF Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--fg-dim);
+    text-transform: uppercase;
+  }
+
+  /* HERO */
+  .hero{
+    padding: 120px 0 100px;
+    position: relative;
+  }
+  .eyebrow{
+    font-family: ui-monospace, 'SF Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--fg-dim);
+    margin-bottom: 28px;
+    display:flex;
+    align-items:center;
+    gap: 12px;
+  }
+  .eyebrow::before{
+    content:"";
+    width: 6px; height: 6px;
+    background: var(--fg);
+    display: inline-block;
+  }
+
+  .gap-title{
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 28px;
+    margin-bottom: 40px;
+  }
+  .gap-line{
+    height: 1px;
+    background: var(--line);
+    width: 100%;
+  }
+  .gap-tag{
+    font-family: ui-monospace, 'SF Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--fg-dim);
+    white-space: nowrap;
+  }
+
+  h1{
+    font-size: clamp(38px, 6.4vw, 74px);
+    line-height: 1.05;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    max-width: 920px;
+  }
+  h1 .dim{ color: var(--fg-dim); font-weight: 400; }
+
+  .hero-foot{
+    margin-top: 56px;
+    display:flex;
+    gap: 48px;
+    flex-wrap: wrap;
+    border-top: 1px solid var(--line-soft);
+    padding-top: 28px;
+  }
+  .hero-foot div{
+    font-family: ui-monospace, 'SF Mono', monospace;
+    font-size: 12px;
+    color: var(--fg-dim);
+    max-width: 260px;
+    line-height: 1.6;
+  }
+  .hero-foot span{ color: var(--fg); display:block; margin-bottom: 6px; letter-spacing: 0.1em; }
+
+  /* SECTION SHELL */
+  section{
+    padding: 96px 0;
+    border-top: 1px solid var(--line-soft);
+  }
+  .section-head{
+    display:flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 56px;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .section-num{
+    font-family: ui-monospace, 'SF Mono', monospace;
+    font-size: 12px;
+    color: var(--fg-dim);
+    letter-spacing: 0.1em;
+  }
+  h2{
+    font-size: clamp(24px, 3vw, 34px);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    max-width: 640px;
+  }
+  .lede{
+    font-size: 17px;
+    color: var(--fg-dim);
+    line-height: 1.75;
+    max-width: 640px;
+  }
+
+  /* POSITIONING - the gap statement */
+  .position-block{
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  .position-row{
+    display:flex;
+    align-items:center;
+    gap: 32px;
+    padding: 22px 0;
+  }
+  .position-num{
+    font-family: ui-monospace, 'SF Mono', monospace;
+    font-size: 13px;
+    color: var(--fg-dim);
+    width: 32px;
+    flex-shrink: 0;
+  }
+  .stat-title{
+    font-size: clamp(30px, 5.5vw, 58px);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    display:flex;
+    align-items:center;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .stat-void{
+    flex: 1;
+    height: 1px;
+    background: repeating-linear-gradient(90deg, var(--line) 0 6px, transparent 6px 12px);
+    min-width: 40px;
+  }
+  .stat-title .against{
+    color: var(--fg-dim);
+    font-size: 0.5em;
+    font-weight: 400;
+    font-family: ui-monospace, 'SF Mono', monospace;
+    letter-spacing: 0.1em;
+  }
+
+  .position-desc{
+    margin-top: 40px;
+    max-width: 640px;
+    color: var(--fg-dim);
+    font-size: 16px;
+    line-height: 1.75;
+  }
+
+  /* TARGET MARKET - HAS / GAP split */
+  .split{
+    display: grid;
+    grid-template-columns: 1fr 1px 1fr;
+    gap: 48px;
+  }
+  .split .divider{ background: var(--line); }
+  .split-col-label{
+    font-family: ui-monospace, 'SF Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    color: var(--fg-dim);
+    margin-bottom: 24px;
+    text-transform: uppercase;
+  }
+  .trait-list{
+    list-style: none;
+  }
+  .trait-list li{
+    font-size: 19px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .trait-list li:last-child{ border-bottom: none; }
+  .trait-list.dim li{ color: var(--fg-dim); }
+
+  /* OFFER - monetization analysis */
+  .analysis-grid{
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1px;
+    background: var(--line-soft);
+    border: 1px solid var(--line-soft);
+  }
+  .analysis-item{
+    background: var(--bg);
+    padding: 32px;
+  }
+  .analysis-item .q{
+    font-family: ui-monospace, 'SF Mono', monospace;
+    font-size: 11px;
+    color: var(--fg-dim);
+    letter-spacing: 0.08em;
+    margin-bottom: 14px;
+    text-transform: uppercase;
+  }
+  .analysis-item .a{
+    font-size: 18px;
+    line-height: 1.5;
+  }
+  .analysis-goal{
+    margin-top: 40px;
+    font-size: 16px;
+    color: var(--fg-dim);
+    max-width: 560px;
+    line-height: 1.75;
+  }
+  .analysis-goal strong{ color: var(--fg); font-weight: 600; }
+
+  /* PROCESS FLOW */
+  .flow{
+    display:flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0;
+  }
+  .flow-step{
+    display:flex;
+    align-items:center;
+    gap: 18px;
+  }
+  .flow-node{
+    padding: 14px 20px;
+    border: 1px solid var(--line);
+    font-size: 15px;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+  }
+  .flow-arrow{
+    font-family: ui-monospace, monospace;
+    color: var(--fg-dim);
+    font-size: 16px;
+    padding: 0 6px;
+  }
+  .flow-note{
+    margin-top: 36px;
+    font-size: 16px;
+    color: var(--fg-dim);
+    max-width: 600px;
+    line-height: 1.75;
+  }
+
+  /* FOOTER */
+  footer{
+    padding: 72px 0 48px;
+    border-top: 1px solid var(--line-soft);
+  }
+  .footer-row{
+    display:flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 24px;
+  }
+  .footer-brand{
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  .footer-meta{
+    font-family: ui-monospace, monospace;
+    font-size: 11px;
+    color: var(--fg-dim);
+    letter-spacing: 0.08em;
+    text-align: right;
+    line-height: 1.8;
+  }
+
+  .reveal{
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.in{
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .reveal{ opacity:1; transform:none; transition:none; }
+    html{ scroll-behavior: auto; }
+  }
+
+  @media (max-width: 760px){
+    .wrap{ padding: 0 20px; }
+    nav{ padding: 18px 20px; }
+    .hero{ padding: 80px 0 64px; }
+    section{ padding: 64px 0; }
+    .split{ grid-template-columns: 1fr; }
+    .split .divider{ display:none; height:1px; }
+    .analysis-grid{ grid-template-columns: 1fr; }
+    .gap-title{ grid-template-columns: 1fr; gap: 14px; }
+    .gap-tag{ text-align: left; }
+    .flow-step{ width: 100%; }
+    .flow{ flex-direction: column; align-items: flex-start; }
+    .flow-arrow{ transform: rotate(90deg); padding: 8px 0; margin-left: 10px; }
+    .footer-row{ flex-direction: column; align-items: flex-start; }
+    .footer-meta{ text-align: left; }
+  }
+
+  a:focus-visible, button:focus-visible{
+    outline: 2px solid var(--fg);
+    outline-offset: 3px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <nav>
+    <div><span class="brand">NALON.SLS</span><span class="brand-sub">UNDER ON ANAS</span></div>
+    <div class="navlabel">CREATOR INFRASTRUCTURE</div>
+  </nav>
+</header>
+
+<main class="wrap">
+
+  <!-- HERO -->
+  <section class="hero" style="border-top:none; padding-bottom:0;">
+    <div class="eyebrow">01 — WHAT IS NALON.SLS</div>
+
+    <h1>
+      Find where a creator's audience, content, or business is <span class="dim">failing to convert into revenue</span> —
+      and build the infrastructure needed to fix it.
+    </h1>
+
+    <div class="hero-foot">
+      <div><span>THE BRAND</span>Nalon.sls is a digital services and technology brand operating under ON Anas.</div>
+      <div><span>CURRENT DIRECTION</span>Focused on creators and the specific problem of monetization.</div>
+    </div>
+  </section>
+
+  <!-- POSITIONING -->
+  <section id="positioning">
+    <div class="section-head reveal">
+      <h2>1:1 Custom — 0 Generic Templates</h2>
+      <span class="section-num mono">02 / POSITIONING</span>
+    </div>
+    <div class="position-desc reveal">
+      Nalon.sls is positioned around building solutions specifically for each client, rather than selling generic templates or one-size-fits-all packages. Clients get a custom digital business system, designed around their specific monetization opportunity.
+    </div>
+  </section>
+
+  <!-- TARGET MARKET -->
+  <section id="market">
+    <div class="section-head reveal">
+      <h2>Who this is built for</h2>
+      <span class="section-num mono">03 / TARGET MARKET</span>
+    </div>
+    <div class="split reveal">
+      <div>
+        <div class="split-col-label">Primary focus — creators who already have</div>
+        <ul class="trait-list">
+          <li>An audience</li>
+          <li>Content</li>
+          <li>Influence</li>
+          <li>A personal brand</li>
+          <li>Products / services</li>
+          <li>Monetization potential</li>
+        </ul>
+      </div>
+      <div class="divider"></div>
+      <div>
+        <div class="split-col-label">…but are missing</div>
+        <ul class="trait-list dim">
+          <li>The proper infrastructure</li>
+          <li>to turn that attention</li>
+          <li>into a functioning</li>
+          <li>business.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- OFFER -->
+  <section id="offer">
+    <div class="section-head reveal">
+      <h2>Entry point: the Monetization Analysis</h2>
+      <span class="section-num mono">04 / OFFER STRUCTURE</span>
+    </div>
+    <div class="analysis-grid reveal">
+      <div class="analysis-item">
+        <div class="q">Identify</div>
+        <div class="a">What the creator currently has</div>
+      </div>
+      <div class="analysis-item">
+        <div class="q">Identify</div>
+        <div class="a">How they currently make money</div>
+      </div>
+      <div class="analysis-item">
+        <div class="q">Identify</div>
+        <div class="a">Where money is being left on the table</div>
+      </div>
+      <div class="analysis-item">
+        <div class="q">Identify</div>
+        <div class="a">What their audience could potentially buy</div>
+      </div>
+      <div class="analysis-item" style="grid-column: 1 / -1;">
+        <div class="q">Identify</div>
+        <div class="a">What infrastructure is missing</div>
+      </div>
+    </div>
+    <div class="analysis-goal reveal">
+      The goal is to identify <strong>the monetization gap</strong>.
+    </div>
+  </section>
+
+  <!-- DELIVERY PHILOSOPHY -->
+  <section id="philosophy">
+    <div class="section-head reveal">
+      <h2>Not a template agency</h2>
+      <span class="section-num mono">05 / DELIVERY PHILOSOPHY</span>
+    </div>
+    <div class="lede reveal" style="margin-bottom:48px;">
+      Nalon.sls isn't supposed to operate like a traditional agency pumping out identical websites.
+    </div>
+    <div class="flow reveal">
+      <div class="flow-step"><div class="flow-node">Understand</div><span class="flow-arrow">→</span></div>
+      <div class="flow-step"><div class="flow-node">Identify the gap</div><span class="flow-arrow">→</span></div>
+      <div class="flow-step"><div class="flow-node">Design the solution</div><span class="flow-arrow">→</span></div>
+      <div class="flow-step"><div class="flow-node">Build</div><span class="flow-arrow">→</span></div>
+      <div class="flow-step"><div class="flow-node">Deploy</div><span class="flow-arrow">→</span></div>
+      <div class="flow-step"><div class="flow-node">Maintain</div></div>
+    </div>
+    <div class="flow-note reveal">
+      The actual deliverable depends on the client's business.
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap footer-row">
+    <div class="footer-brand">NALON.SLS</div>
+    <div class="footer-meta">DIGITAL SERVICES & TECHNOLOGY<br>UNDER ON ANAS</div>
+  </div>
+</footer>
+
+<script>
+  const els = document.querySelectorAll('.reveal');
+  if('IntersectionObserver' in window){
+    const io = new IntersectionObserver((entries)=>{
+      entries.forEach(e=>{
+        if(e.isIntersecting){
+          e.target.classList.add('in');
+          io.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.15 });
+    els.forEach(el=>io.observe(el));
+  } else {
+    els.forEach(el=>el.classList.add('in'));
+  }
+</script>
+
+</body>
+</html>
